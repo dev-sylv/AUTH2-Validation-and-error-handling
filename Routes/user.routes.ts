@@ -1,5 +1,7 @@
-import express from "express";
+import express, { Router } from "express";
 
 import{ } from "../Controller/users.controllers";
 
-con
+const router = Router();
+
+router.route("/getusers")

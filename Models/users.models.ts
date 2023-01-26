@@ -1,42 +1,52 @@
 import mongoose, { Schema, model, Document } from "mongoose";
 
-interface user{
+interface users {
     name: string;
     email: string;
     password: string;
-    stack: string;
-    isAdmin: boolean
-};
+    wishlist: [];
+    shop: {}[];
+    shoppedList: {}[];
+}
 
-interface iUser extends user, Document{};
+interface iUSERS extends users, Document{};
 
-const userSchema = new Schema({
-    name: {
+const userSchema  = new Schema({
+    name:{
         type: String,
-        required: [true, "Please enter your name"]
+        required: [true, "Please enter your email if you're a human being"]
     },
     email: {
         type: String,
-        required: [true, "Please enter your email"],
+        required: [true, "Please enter your email dear human being"],
         unique: true,
-        trim: true,
-        lowercase: true
+        lowercase: true,
+        trim: true
     },
     password: {
         type: String,
-        required: [true, "Please enter a strong password"],
-        minlength: 8,
+        required: [true, "Please enter your a strong password"],
+        minlength : 8,
     },
-    stack: {
-        type: String,
-        required: [true, "Please enter your stack"]
-    },
-    isAdmin: {
-        type: String,
-        default: false
-    }
-});
+    wishlist: [
+        {
+            type: String,
+        }
+    ],
+    shop: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "shopCollections"
+        }
+    ],
+    shoppedList: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "productsCollections"
+        }
+    ]
+}, {timestamps: true});
 
-const userModels = model<iUser>("new users collections", userSchema);
+const usersModel = model<iUSERS>("usersCollections", userSchema);
 
-export default userModels;
+export default usersModel;

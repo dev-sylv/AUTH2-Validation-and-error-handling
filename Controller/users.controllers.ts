@@ -55,3 +55,13 @@ export const GetAllUsers = asyncHandler(
         })
     }
 )
+
+// Login:
+
+export const LoginUsers = asyncHandler(
+    async(req: Request<{}, {}, userData>, res: Response, next: NextFunction): Promise<Response> =>{
+        const {name, email} = req.body;
+
+        const user = await userModel.findOne({email});
+    }
+)

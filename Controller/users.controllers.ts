@@ -9,22 +9,27 @@ import bcrypt from "bcrypt"
 
 export const CreateUser = asyncHandler(
     async(req:Request<{} , {} ,userData > , res:Response , next:NextFunction):Promise<Response> =>{
-        const {name , email , password , wishList , products} = req.body
+        const {name , email , password , wishList , products} = req.body;
+
         const salt = await bcrypt.genSalt(10)
-        const hashedPassword = await bcrypt.hash(password , salt)
+        const hashedPassword = await bcrypt.hash(password , salt);
+
         const newUser = await userModel.create({
-            name , email , password:hashedPassword ,
+            name ,
+            email , 
+            password: hashedPassword ,
+            wishList,
+            products
         })
         if(!newUser){
-next(
-    new AppError({
-        message : "unable to create user",
-        httpCode: HttpCodes.BAD_REQUEST,
-        name : AppError.name
+            next(
+                new AppError({
+                    message : "unable to create user",
+                    httpCode: HttpCodes.BAD_REQUEST,
+                    name : AppError.name
         
-    })
+        })
 )
-
 
         }
         return res.status(201).json({
@@ -60,8 +65,32 @@ export const GetAllUsers = asyncHandler(
 
 export const LoginUsers = asyncHandler(
     async(req: Request<{}, {}, userData>, res: Response, next: NextFunction): Promise<Response> =>{
-        const {name, email} = req.body;
+        const {email} = req.body;
+
+        if (!email) {
+            next(
+                new AppError({
+                    message: "Please enter an email",
+                    httpCode: HttpCodes.NOT_FOUND,
+                    name: AppError.name
+                })
+            )
+        }
 
         const user = await userModel.findOne({email});
+        if (!user) {
+            next(
+                new AppError({
+                    message: "User does not exist, please sign up",
+                    httpCode: HttpCodes.NOT_FOUND,
+                    name: AppError.name
+                })
+            )
+        }
+
+        return res.status(201).json({
+            message: `User login successful`,
+            data: `Welcome ${user?.name}`
+        })
     }
 )

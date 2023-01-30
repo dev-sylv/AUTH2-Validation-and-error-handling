@@ -1,52 +1,44 @@
-import mongoose, { Schema, model, Document } from "mongoose";
+import mongoose from "mongoose";
 
-interface users {
-    name: string;
-    email: string;
-    password: string;
-    wishlist: [];
-    shop: {}[];
-    shoppedList: {}[];
-}
+import { userData } from "./AllInterfaces";
 
-interface iUSERS extends users, Document{};
+interface user extends userData , mongoose.Document{}
 
-const userSchema  = new Schema({
-    name:{
-        type: String,
-        required: [true, "Please enter your email if you're a human being"]
+
+const userSchema = new mongoose.Schema({
+    name : {
+        type : String,
+        required : [true , "please  enter your name"],
+        trim : true
     },
-    email: {
-        type: String,
-        required: [true, "Please enter your email dear human being"],
-        unique: true,
-        lowercase: true,
-        trim: true
+    email : {
+        type : String,
+        required :  [true , "please enter a valid email"],
+        lowercase : true,
+        unique : true ,
+        trim : true
     },
-    password: {
-        type: String,
-        required: [true, "Please enter your a strong password"],
-        minlength : 8,
+    password : {
+        type : String,
+        minlength : 6,
+        maxlength : 15,
+        required : [true , "please enter your password"]
     },
-    wishlist: [
+    wishList :[
         {
-            type: String,
+            type : mongoose.Schema.Types.ObjectId,
+            ref: "WishList Collections"
         }
     ],
-    shop: [
+    products :[
         {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "shopCollections"
-        }
-    ],
-    shoppedList: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "productsCollections"
+            type : mongoose.Schema.Types.ObjectId,
+            ref: "products Collections"
         }
     ]
-}, {timestamps: true});
+} , {timestamps : true})
 
-const usersModel = model<iUSERS>("usersCollections", userSchema);
+const userModel = mongoose.model<user>("user collections" , userSchema)
 
-export default usersModel;
+
+export default userModel

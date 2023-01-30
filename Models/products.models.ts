@@ -1,33 +1,38 @@
-import mongoose, {Schema, Document, model } from "mongoose";
+import mongoose from "mongoose";
+import { productData } from "./AllInterfaces";
 
-interface products{
-    productname: string,
-    quantity: string,
-    price: string,
-    shopname: string
-};
+interface products extends productData, mongoose.Document{};
 
-interface iPRODUCTS extends products, Document{};
-
-const productSchema = new Schema({
-    productname: {
+const productSchema = new mongoose.Schema<productData>({
+    name: {
         type: String,
-        required: [true, "Enter the product name"]
+        required: [true, "Please enter Product Name"]
     },
-    quantity: {
+    category: {
         type: String,
-        required: [true, "Enter product Quantity"]
+        required: [true, "Please enter product category e.g Utensils, Laptops"]
     },
     price: {
         type: String,
-        required: [true, "Enter Product Price"]
+        required: [true, "Please enter your product price"]
     },
-    shop: {
-        type: String,
-        required: [true, "What shop are you buying products from?"]
-    }
-}, {timestamps: true});
+    not_in_stock: {
+        type: Boolean,
+        required: [true, "Is the product available"]
+    },
+    purchased: {
+        type: Boolean,
+        default: false
+    },
+    wishList: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "WishList Collections"
+        }
+    ]
 
-const productsModel = model<iPRODUCTS>("productsCollections", productSchema)
+},{timestamps : true});
 
-export default productsModel;
+const productModel = mongoose.model<products>("products Collections", productSchema);
+
+export default productModel;

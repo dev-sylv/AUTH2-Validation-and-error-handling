@@ -1,15 +1,20 @@
-import express from "express";
-import { Application } from "express-serve-static-core";
+import express, { Application } from "express"
 import { AppConfig } from "./app";
-import DBconnect from "./Config/db";
+import { DBconnect } from "./Config/db";
 
-const port: number = 3030;
 
-const app: Application = express();
+const port : number = 5000
 
-DBconnect()
+
+
+const app: Application =  express();
+
 AppConfig(app)
+DBconnect()
 
-app.listen(port, () =>{
-    console.log("Listening to my port on ",port)
+app.listen(port , ()=>{
+    console.log("")
+    console.log(`server is up on port ${port}`)
 })
+
+

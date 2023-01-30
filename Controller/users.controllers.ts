@@ -1,83 +1,57 @@
-import userModels from "../Models/users.models";
+import userModel from "../Models/users.models";
+import { Request , Response , NextFunction} from "express";
+import { asyncHandler } from "../utils/AsyncHandler";
+import { AppError, HttpCodes } from "../utils/AppError";
+import { userData } from "../Models/AllInterfaces";
+import bcrypt from "bcrypt"
 
-import bcrypt from "bcrypt";
+//create user 
 
-import {Request, Response} from "express";
-
-// create users:
-export const createUsers = async(req: Request, res: Response): Promise<Response> =>{
-    try {
-        const {name, email, password, stack, isAdmin} = req.body;
-        const saltedPassword = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, saltedPassword)
-        const user = await userModels.create({
-            name,
-            email,
-            password: hashedPassword,
-            stack,
-            isAdmin,
+export const CreateUser = asyncHandler(
+    async(req:Request<{} , {} ,userData > , res:Response , next:NextFunction):Promise<Response> =>{
+        const {name , email , password , wishList , products} = req.body
+        const salt = await bcrypt.genSalt(10)
+        const hashedPassword = await bcrypt.hash(password , salt)
+        const newUser = await userModel.create({
+            name , email , password:hashedPassword ,
         })
-        if(!user){
-            return res.status(401).json({
-                status: "Please fill in all required fields",
-            })
+        if(!newUser){
+next(
+    new AppError({
+        message : "unable to create user",
+        httpCode: HttpCodes.BAD_REQUEST,
+        name : AppError.name
+        
+    })
+)
+
+
         }
         return res.status(201).json({
-            status: "Successfully created this user",
-            data: user
-        })
-    } catch (error) {
-        return res.status(400).json({
-            status: "An error occured in creating new users",
-            data: error
+            message : "created successfully",
+            data : newUser
         })
     }
-}
+)
 
-// login for users:
-export const loginUsers = async(req: Request, res: Response): Promise<Response> =>{
-    try {
-        const { email, password} = req.body;
-        const user = await userModels.findOne({email});
-        if (!email) {
-            return res.status(400).json({
-                status: "Please enter your email",
-            })  
-        }
-        if (!password) {
-            return res.status(400).json({
-                status: "Please enter your password",
-            }) 
-        }
-        if (!user) {
-            return res.status(400).json({
-                status: "User not found",
-            }) 
-        }
-        return res.status(201).json({
-                status: "Users Login Successful",
-                data: user
-            }) 
-    } catch (error) {
-        return res.status(400).json({
-            status: "An error occured in logging this user",
-            data: error
-        })
-    }
-}
 
-// get all users:
-export const getAllUsers = async(req: Request, res: Response): Promise<Response> =>{
-    try {
-        const users = await userModels.find();
+// get all users
+
+export const GetAllUsers = asyncHandler(
+    async(req: Request<{}, {}, userData>, res: Response, next: NextFunction): Promise<Response> =>{
+        const users = await userModel.find();
+        if (!users) {
+            next(
+                new AppError({
+                    message: "No user found",
+                    httpCode: HttpCodes.NOT_FOUND,
+                    name: AppError.name
+                })
+            )
+        }
         return res.status(200).json({
-            status: `Successfully got all ${users.length}(s)`,
+            message: `Sucessfully got all ${users.length} user(s)`,
             data: users
         })
-    } catch (error) {
-        return res.status(400).json({
-            status: "An error occured in getting all users",
-            data: error
-        })
     }
-}
+)

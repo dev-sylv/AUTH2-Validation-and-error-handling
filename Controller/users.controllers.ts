@@ -1,4 +1,5 @@
 import userModel from "../Models/users.models";
+import productModel from "../Models/products.models";
 import { Request , Response , NextFunction} from "express";
 import { asyncHandler } from "../utils/AsyncHandler";
 import { AppError, HttpCodes } from "../utils/AppError";
@@ -14,12 +15,14 @@ export const CreateUser = asyncHandler(
         const salt = await bcrypt.genSalt(10)
         const hashedPassword = await bcrypt.hash(password , salt);
 
+        const AllProducts = await productModel.find();
+
         const newUser = await userModel.create({
             name ,
             email , 
             password: hashedPassword ,
             wishList,
-            products
+            products: AllProducts,
         })
         if(!newUser){
             next(
@@ -33,7 +36,7 @@ export const CreateUser = asyncHandler(
 
         }
         return res.status(201).json({
-            message : "created successfully",
+            message : "User Created successfully",
             data : newUser
         })
     }

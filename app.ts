@@ -1,6 +1,7 @@
 import express, { Application } from "express";
 import morgan from "morgan";
-import router from "./Routes/user.routes";
+import userRouter from "./Routes/user.routes";
+import productRouter from "./Routes/products.routes"
 
 export const AppConfig = (app: Application) =>{
     // middlewares 
@@ -9,5 +10,6 @@ export const AppConfig = (app: Application) =>{
     app.use(morgan("dev"));
 
     // Routes for our application:
-    app.use("api/users", router)
+    app.use("/api/users", userRouter);
+    app.use("/api/products", productRouter)
 }

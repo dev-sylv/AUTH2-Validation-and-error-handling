@@ -21,7 +21,6 @@ const userSchema = new mongoose.Schema({
     password : {
         type : String,
         minlength : 6,
-        maxlength : 15,
         required : [true , "please enter your password"]
     },
     wishList :[

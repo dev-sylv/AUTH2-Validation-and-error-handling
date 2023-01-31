@@ -50,6 +50,26 @@ export const EnterProducts = asyncHandler(
 
 
 // Get all products:
+export const getAllProducts = asyncHandler(
+    async(req: Request, res: Response, next: NextFunction): Promise<Response> =>{
+        const products = await productModel.find();
+
+        if (!products) {
+            next(
+                new AppError({
+                    name: "Unable to find products",
+                    httpCode: HttpCodes.NOT_FOUND,
+                    message: AppError.name,
+                    isOperational: true
+                })
+            )
+        }
+
+        return res.status(200).json({
+            message: 
+        })
+    }
+)
 
 
 

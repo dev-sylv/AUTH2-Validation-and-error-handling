@@ -47,7 +47,7 @@ export const CreateUser = asyncHandler(
 
 export const GetAllUsers = asyncHandler(
     async(req: Request<{}, {}, userData>, res: Response, next: NextFunction): Promise<Response> =>{
-        const users = await userModel.find();
+        const users = await userModel.find().sort({createdAt: -1});
         if (!users) {
             next(
                 new AppError({

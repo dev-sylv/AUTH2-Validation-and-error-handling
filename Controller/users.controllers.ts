@@ -36,7 +36,7 @@ export const CreateUser = asyncHandler(
 )
 
         }
-        return res.status(201).json({
+        return res.status(HttpCodes.CREATED).json({
             message : "User Created successfully",
             data : newUser
         })
@@ -67,7 +67,7 @@ export const GetAllUsers = asyncHandler(
                 })
             )
         }
-        return res.status(200).json({
+        return res.status(HttpCodes.OK).json({
             message: `Sucessfully got all ${users.length} user(s)`,
             data: users
         })
@@ -77,13 +77,22 @@ export const GetAllUsers = asyncHandler(
 // Login:
 
 export const LoginUsers = asyncHandler(
-    async(req: Request<{}, {}, userData>, res: Response, next: NextFunction): Promise<Response> =>{
-        const {email} = req.body;
+    async(req: Request, res: Response, next: NextFunction): Promise<Response> =>{
+        const {email, password} = req.body;
 
         if (!email) {
             next(
                 new AppError({
                     message: "Please enter an email",
+                    httpCode: HttpCodes.NOT_FOUND,
+                    name: AppError.name
+                })
+            )
+        }
+        if (!password) {
+            next(
+                new AppError({
+                    message: "Please fill in all fields",
                     httpCode: HttpCodes.NOT_FOUND,
                     name: AppError.name
                 })
@@ -99,9 +108,22 @@ export const LoginUsers = asyncHandler(
                     name: AppError.name
                 })
             )
+        };
+
+        const checkPassword = await bcrypt.compare(password, user?.password);
+
+        if (!checkPassword) {
+            next(
+                new AppError({
+                    message: "Either Email or Password not correct",
+                    name: AppError.name,
+                    isOperational: true,
+                    httpCode: HttpCodes.FORBIDDEN
+                })
+            )
         }
 
-        return res.status(201).json({
+        return res.status(HttpCodes.OK).json({
             message: `User login successful`,
             data: `Welcome ${user?.name}`
         })
@@ -124,7 +146,7 @@ export const deleteAllUsers = asyncHandler(
             )
         }
 
-        return res.status(200).json({
+        return res.status(HttpCodes.OK).json({
             message: `Successfully deleted all ${userModel.length} product(S)`,
             data: deleteUsers
         })
@@ -145,7 +167,7 @@ export const GetOneUser = asyncHandler(
                 })
             )
         }
-        return res.status(200).json({
+        return res.status(HttpCodes.OK).json({
             message: `Sucessfully got this user. Welcome ${users?.name}`,
             data: users
         })

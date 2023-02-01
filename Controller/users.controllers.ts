@@ -50,7 +50,16 @@ export const CreateUser = asyncHandler(
 
 export const GetAllUsers = asyncHandler(
     async(req: Request<{}, {}, userData>, res: Response, next: NextFunction): Promise<Response> =>{
-        const users = await userModel.find().sort({createdAt: -1});
+        const users = await userModel.find().populate([
+            {
+                path: "products",
+                options: {
+                    sort: {
+                        createdAt: -1
+                    }
+                }
+            }
+        ]);
         if (!users) {
             next(
                 new AppError({
@@ -128,11 +137,7 @@ export const deleteAllUsers = asyncHandler(
 
 export const GetOneUser = asyncHandler(
     async(req: Request, res: Response, next: NextFunction): Promise<Response> =>{
-        const users = await userModel.findById(req.params.userID).populate([
-            {
-                path: "wishList"
-            }
-        ]);
+        const users = await userModel.findById(req.params.userID);
         if (!users) {
             next(
                 new AppError({

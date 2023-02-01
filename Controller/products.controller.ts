@@ -15,6 +15,16 @@ import mongoose from "mongoose";
 // Enter new products:
 export const EnterProducts = asyncHandler(
     async(req: Request, res: Response, next: NextFunction): Promise<Response> =>{
+
+        if (!req.body) {
+           next(
+            new AppError({
+                message: "Enter valid inputs, fields are empty",
+                isOperational: true,
+                httpCode: HttpCodes.BAD_REQUEST
+            })
+           ) 
+        }
         const {name, category, price, purchased, wishList, not_in_stock} = req.body;
 
         const user = await userModel.findById(req.params.userID);
@@ -41,7 +51,7 @@ export const EnterProducts = asyncHandler(
                 })
             )
         }
-        return res.status(201).json({
+        return res.status(HttpCodes.CREATED).json({
             message: "Successfully added more products",
             data: newProducts
         })
@@ -65,7 +75,7 @@ export const getAllProducts = asyncHandler(
             )
         }
 
-        return res.status(200).json({
+        return res.status(HttpCodes.OK).json({
             message: `Successfully got all ${products.length} products`,
             data: products
         })
@@ -90,7 +100,7 @@ export const getProductsByCategory = asyncHandler(
             )
         }
 
-        return res.status(200).json({
+        return res.status(HttpCodes.OK).json({
             message: `Successfully got all ${products.length} product(s) in the ${category} category aspects`,
             data: products
         })
@@ -113,7 +123,7 @@ export const deleteAllProducts = asyncHandler(
             )
         }
 
-        return res.status(200).json({
+        return res.status(HttpCodes.OK).json({
             message: `Successfully deleted all ${productModel.length} product(S)`,
             data: deleteProducts
         })
@@ -147,7 +157,7 @@ export const updateProducts = asyncHandler(
                 )
             )
         }
-        return res.status(201).json({
+        return res.status(HttpCodes.OK).json({
             message: "Successfully updated products",
             data: updates
         })
@@ -183,7 +193,7 @@ export const pushToWishlist = asyncHandler(
             user?.save();
         }
 
-        return res.status(200).json({
+        return res.status(HttpCodes.CREATED).json({
             message: "Successfully added to Wishlist",
             data: user
         })

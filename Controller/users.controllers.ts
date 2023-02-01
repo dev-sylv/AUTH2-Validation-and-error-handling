@@ -110,7 +110,7 @@ export const LoginUsers = asyncHandler(
             )
         };
 
-        const checkPassword = await bcrypt.compare(password, user?.password);
+        const checkPassword = await bcrypt.compare(password, user!.password);
 
         if (!checkPassword) {
             next(
@@ -118,7 +118,7 @@ export const LoginUsers = asyncHandler(
                     message: "Either Email or Password not correct",
                     name: AppError.name,
                     isOperational: true,
-                    httpCode: HttpCodes.FORBIDDEN
+                    httpCode: HttpCodes.UNAUTHORIZED
                 })
             )
         }

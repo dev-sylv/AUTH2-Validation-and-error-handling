@@ -1,12 +1,15 @@
 import express, { Router } from "express";
 import { CreateUser, deleteAllUsers, GetAllUsers, GetOneUser, LoginUsers } from "../Controller/users.controllers";
 
+import { loginValidation, registerValidation } from "../Validation/Auth/userValidation";
+
 const router = Router();
 
-router.route("/registerusers").post(CreateUser);
+// Parsing validation middlewares:
+router.route("/registerusers").post(registerValidation, CreateUser);
+router.route("/userslogin").post(loginValidation, LoginUsers);
 router.route("/getallusers").get(GetAllUsers);
 router.route("/getoneuser/:userID").get(GetOneUser);
-router.route("/userslogin").post(LoginUsers);
 router.route("/deleteallusers").delete(deleteAllUsers);
 
 export default router

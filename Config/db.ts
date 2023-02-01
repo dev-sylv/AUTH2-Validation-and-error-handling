@@ -7,6 +7,7 @@ export const DBconnect = async(): Promise<void> =>{
         const connect = await mongoose.connect(DB_URL);
         console.log(`DB is connected to ${connect.connection.host}`)
     } catch (error) {
-        console.log(`Couldn't connect to ${DB_URL}`)
+        console.log(`Couldn't connect to ${DB_URL}`);
+        process.exit(1);
     }
 }

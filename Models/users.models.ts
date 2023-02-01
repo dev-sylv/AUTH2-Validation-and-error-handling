@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import isEmail from "validator/lib/isEmail";
 
 import { userData } from "./AllInterfaces";
 
@@ -16,11 +17,12 @@ const userSchema = new mongoose.Schema({
         required :  [true , "please enter a valid email"],
         lowercase : true,
         unique : true ,
-        trim : true
+        trim : true,
+        validate: [isEmail, "Please enter a valid email"]
     },
     password : {
         type : String,
-        minlength : 6,
+        minlength : 8,
         required : [true , "please enter your password"]
     },
     wishList :[

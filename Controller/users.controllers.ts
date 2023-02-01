@@ -16,15 +16,13 @@ export const CreateUser = asyncHandler(
         const salt = await bcrypt.genSalt(10)
         const hashedPassword = await bcrypt.hash(password , salt);
 
-        const MywishList = await wishListModel.find()
-
         const AllProducts = await productModel.find();
 
         const newUser = await userModel.create({
             name ,
             email , 
             password: hashedPassword ,
-            wishList: MywishList,
+            wishList,
             products: AllProducts,
         })
         if(!newUser){

@@ -5,6 +5,7 @@ import { asyncHandler } from "../utils/AsyncHandler";
 import { AppError, HttpCodes } from "../utils/AppError";
 import { userData } from "../Models/AllInterfaces";
 import bcrypt from "bcrypt"
+import wishListModel from "../Models/wishlist.models";
 
 //create user 
 
@@ -15,13 +16,15 @@ export const CreateUser = asyncHandler(
         const salt = await bcrypt.genSalt(10)
         const hashedPassword = await bcrypt.hash(password , salt);
 
+        const MywishList = await wishListModel.find()
+
         const AllProducts = await productModel.find();
 
         const newUser = await userModel.create({
             name ,
             email , 
             password: hashedPassword ,
-            wishList,
+            wishList: MywishList,
             products: AllProducts,
         })
         if(!newUser){
@@ -124,8 +127,12 @@ export const deleteAllUsers = asyncHandler(
 // Get one user:
 
 export const GetOneUser = asyncHandler(
-    async(req: Request<{}, {}, userData>, res: Response, next: NextFunction): Promise<Response> =>{
-        const users = await userModel.findById(req.params.userID);
+    async(req: Request, res: Response, next: NextFunction): Promise<Response> =>{
+        const users = await userModel.findById(req.params.userID).populate([
+            {
+                path: "wishList"
+            }
+        ]);
         if (!users) {
             next(
                 new AppError({

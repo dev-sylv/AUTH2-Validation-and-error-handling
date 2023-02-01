@@ -154,3 +154,38 @@ export const updateProducts = asyncHandler(
     }
    
 )
+
+//  Push/connect purchased field === true to wishlist for a user
+
+export const pushToWishlist = asyncHandler(
+    async(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<Response> =>{
+        const {purchased} = req.body;
+        const getPurchased = await productModel.findOne({purchased});
+
+        const user = await userModel.findById(req.params.userID);
+
+        if (!getPurchased) {
+            next(
+                new AppError({
+                    name: "Couldn't find any purchased products",
+                    isOperational: true,
+                    message: AppError.name,
+                    httpCode: HttpCodes.NOT_FOUND
+                })
+            )
+        }
+        if (purchased === true) {
+            user?.wishList.push(new mongoose.Types.ObjectId(getPurchased?._id));
+            user?.save();
+        }
+
+        return res.status(200).json({
+            message: "Successfully added to Wishlist",
+            data: user
+        })
+    }
+)

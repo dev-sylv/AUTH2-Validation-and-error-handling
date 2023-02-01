@@ -77,7 +77,7 @@ export const getAllProducts = asyncHandler(
 export const getProductsByCategory = asyncHandler(
     async(req: Request, res: Response, next: NextFunction): Promise<Response> =>{
         const {category} = req.body;
-        const products = await productModel.findOne({category});
+        const products = await productModel.findOne({category}).find();
 
         if (!products) {
             next(
@@ -91,7 +91,7 @@ export const getProductsByCategory = asyncHandler(
         }
 
         return res.status(200).json({
-            message: `Successfully got all product(s) in the ${category} category aspects`,
+            message: `Successfully got all ${products.length} product(s) in the ${category} category aspects`,
             data: products
         })
     }
@@ -114,8 +114,43 @@ export const deleteAllProducts = asyncHandler(
         }
 
         return res.status(200).json({
-            message: `Successfully deleted all ${deleteAllProducts.length} product(S)`,
+            message: `Successfully deleted all ${productModel.length} product(S)`,
             data: deleteProducts
         })
     }
+);
+
+// Update Products purchased and in stock:
+export const updateProducts = asyncHandler(
+    async(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<Response> =>{
+        const { purchased, not_in_stock } = req.body;
+
+        const updates = await productModel.findByIdAndUpdate(
+            req.params.productID,
+            {purchased, not_in_stock},
+            {new: true}
+        )
+
+        if (!updates) {
+            asyncHandler(
+                next(
+                    new AppError({
+                        name: "Couldn't update",
+                        message: AppError.name,
+                        isOperational: true,
+                        httpCode: HttpCodes.UNAUTHORIZED
+                    })
+                )
+            )
+        }
+        return res.status(201).json({
+            message: "Successfully updated products",
+            data: updates
+        })
+    }
+   
 )

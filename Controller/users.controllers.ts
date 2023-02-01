@@ -97,3 +97,47 @@ export const LoginUsers = asyncHandler(
         })
     }
 )
+
+//  Delete all products:
+export const deleteAllUsers = asyncHandler(
+    async(req: Request, res: Response, next: NextFunction): Promise<Response> =>{
+        const deleteUsers = await userModel.deleteMany();
+
+        if (!deleteUsers) {
+            next(
+                new AppError({
+                    name: "Unable to delete all users",
+                    httpCode: HttpCodes.SERVICE_UNAVAILABLE,
+                    message: AppError.name,
+                    isOperational: true
+                })
+            )
+        }
+
+        return res.status(200).json({
+            message: `Successfully deleted all ${userModel.length} product(S)`,
+            data: deleteUsers
+        })
+    }
+);
+
+// Get one user:
+
+export const GetOneUser = asyncHandler(
+    async(req: Request<{}, {}, userData>, res: Response, next: NextFunction): Promise<Response> =>{
+        const users = await userModel.findById(req.params.userID);
+        if (!users) {
+            next(
+                new AppError({
+                    message: "No user found",
+                    httpCode: HttpCodes.NOT_FOUND,
+                    name: AppError.name
+                })
+            )
+        }
+        return res.status(200).json({
+            message: `Sucessfully got this user. Welcome ${users?.name}`,
+            data: users
+        })
+    }
+)

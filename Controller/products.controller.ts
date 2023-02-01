@@ -52,7 +52,7 @@ export const EnterProducts = asyncHandler(
 // Get all products:
 export const getAllProducts = asyncHandler(
     async(req: Request, res: Response, next: NextFunction): Promise<Response> =>{
-        const products = await productModel.find();
+        const products = await productModel.find().sort({createdAt: -1});
 
         if (!products) {
             next(
@@ -66,11 +66,56 @@ export const getAllProducts = asyncHandler(
         }
 
         return res.status(200).json({
-            message: 
+            message: `Successfully got all ${products.length} products`,
+            data: products
+        })
+    }
+);
+
+
+// Get products in different categories:
+export const getProductsByCategory = asyncHandler(
+    async(req: Request, res: Response, next: NextFunction): Promise<Response> =>{
+        const {category} = req.body;
+        const products = await productModel.findOne({category});
+
+        if (!products) {
+            next(
+                new AppError({
+                    name: "Unable to find products",
+                    httpCode: HttpCodes.NOT_FOUND,
+                    message: AppError.name,
+                    isOperational: true
+                })
+            )
+        }
+
+        return res.status(200).json({
+            message: `Successfully got all product(s) in the ${category} category aspects`,
+            data: products
+        })
+    }
+);
+
+// Delete all products:
+export const deleteAllProducts = asyncHandler(
+    async(req: Request, res: Response, next: NextFunction): Promise<Response> =>{
+        const deleteProducts = await productModel.deleteMany();
+
+        if (!deleteProducts) {
+            next(
+                new AppError({
+                    name: "Unable to delete all products",
+                    httpCode: HttpCodes.SERVICE_UNAVAILABLE,
+                    message: AppError.name,
+                    isOperational: true
+                })
+            )
+        }
+
+        return res.status(200).json({
+            message: `Successfully deleted all ${deleteAllProducts.length} product(S)`,
+            data: deleteProducts
         })
     }
 )
-
-
-
-// 
